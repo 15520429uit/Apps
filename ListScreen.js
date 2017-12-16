@@ -2,7 +2,6 @@ import React from 'react';
 import {
   TouchableWithoutFeedback,
   TouchableHighlight,
-  ActivityIndicator,
   TouchableOpacity,
   AsyncStorage,
   StyleSheet,
@@ -171,6 +170,35 @@ class ListScreen extends React.Component {
     return temp;
   }
   
+  showListView()
+  {
+    let temp = this.setData();
+    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
+    
+    if(temp.length)
+    {
+      return <ListView
+            ref = {ref => this.listView = ref}
+            style = {{flex:1, borderWidth: 1, borderColor: '#3333'}}
+            dataSource = {ds.cloneWithRows(temp)}
+            enableEmptySections = {true}
+            renderRow = {rowData => this.showData(rowData)}
+            renderSeparator = {(sectionID, rowID, adjacentRowHighlighted) => <View key = {rowID} style = {{height : 2, backgroundColor: 'lightgray'}}/>}
+          />
+    }
+    temp[0] = 1;
+    return <ListView
+            ref = {ref => this.listView = ref}
+            style = {{flex:1, borderWidth: 1, borderColor: '#3333'}}
+            dataSource = {ds.cloneWithRows(temp)}
+            enableEmptySections = {true}
+            renderRow = {() => {return <Text style={{textAlign: 'center'}}>(Empty - no item fit the criteria)</Text>
+            }}
+            renderSeparator = {(sectionID, rowID, adjacentRowHighlighted) => <View key = {rowID} style = {{height : 2, backgroundColor: 'lightgray'}}/>}
+          />
+    
+  }
+  
   showData(rowData)
   {
     const {navigate} = this.props.navigation;
@@ -198,15 +226,7 @@ class ListScreen extends React.Component {
 
   render() 
   {
-    let temp = this.setData();
-    const ds = new ListView.DataSource({rowHasChanged: (r1, r2) => r1 !== r2});
-    if (this.state.isLoading) {
-      return (
-        <View style = {{flex: 1, paddingTop: 20}}>
-          <ActivityIndicator />
-        </View>
-      );
-    }
+    
 
     return (
       <Image style={styles.wallpaper} source={{uri: 'https://t4.ftcdn.net/jpg/00/77/52/05/500_F_77520557_BHp5eNeZs7DAaLuysLiNFYXkO6uE76e8.jpg'}}>
@@ -218,14 +238,7 @@ class ListScreen extends React.Component {
             {this.favouriteButton()}
           </View>
           <View style={{height: 5, backgroundColor: '#1119'}}/>
-          <ListView
-            ref = {ref => this.listView = ref}
-            style = {{flex:1, borderWidth: 1, borderColor: '#3333'}}
-            dataSource = {ds.cloneWithRows(temp)}
-            enableEmptySections = {true}
-            renderRow = {rowData => this.showData(rowData)}
-            renderSeparator = {(sectionID, rowID, adjacentRowHighlighted) => <View key = {rowID} style = {{height : 2, backgroundColor: 'lightgray'}}/>}
-          />
+          {this.showListView()}
         </View>
       </Image>
     );
